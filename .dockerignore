@@ -1,0 +1,8 @@
+.git
+.env
+jobs
+scratch
+tests
+**/__pycache__
+*.tar
+*.tar.gz

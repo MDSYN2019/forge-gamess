@@ -1,0 +1,10 @@
+vendor/*
+!vendor/.gitkeep
+jobs/
+scratch/
+.env
+*.tar
+*.tar.gz
+__pycache__/
+
+runs/
