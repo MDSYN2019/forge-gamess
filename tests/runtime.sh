@@ -17,6 +17,7 @@ printf 'punch output\n' > "$USERSCR/result.dat"
 case "$2" in
   01) echo 'calculation aborted'; exit 0;;
   02) echo 'launcher failed'; exit 7;;
+  03) echo 'launcher stderr' >&2;;
 esac
 echo 'EXECUTION OF GAMESS TERMINATED NORMALLY'
 LAUNCHER
@@ -42,5 +43,10 @@ expect 1 water.inp 01 1
 expect 7 water.inp 02 1
 expect 2 water.inp 00 0
 expect 2 water.inp 00 invalid
+expect 2 water.inp invalid 1
+expect 2 water.inp 00 000
+expect 2 water.inp 00 1 extra
 expect 2 missing.inp
+run water.inp 03 1
+test "$(find "$root/work" -name '*.log' -exec grep -l 'launcher stderr' {} \; | wc -l)" -eq 1
 printf 'PASS: success, collision isolation, abnormal termination, exit propagation, invalid CPU counts, missing input\n'
