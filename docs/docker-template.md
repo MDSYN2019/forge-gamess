@@ -1,13 +1,7 @@
-# Docker template — deferred
-
-Docker support is unfinished and optional. Use the native local workflow in
-[the README](../README.md) for current testing. The instructions below are
-reference material for completing the template, not a verified deployment.
-
-# forge-gamess
+# Docker setup and deployment
 
 Docker packaging targeting **GAMESS (US) 2023 R1** single-host batch calculations. No licensed
-GAMESS source or binaries are included. This is a packaging scaffold: a real
+GAMESS source or binaries are included. A real
 GAMESS calculation must pass the acceptance checks below before deployment.
 There is no HTTP service or listening port.
 
@@ -50,7 +44,7 @@ ARM compilation is outside this initial packaging target.
 Prerequisites: Docker Engine/Desktop with BuildKit and Docker Compose v2.
 
 ```sh
-docker build --platform linux/amd64 --target packaged -t forge-gamess:local .
+docker compose build
 mkdir -p jobs scratch
 cp examples/water.inp jobs/
 export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g)
@@ -102,7 +96,7 @@ docker compose run --rm gamess water.inp 00 1
 
 Alternatively push an authorized private registry tag, pull it on the server,
 and set `GAMESS_IMAGE` to its immutable `registry/repository@sha256:...` digest.
-Pin the base image digest through `--build-arg BASE_IMAGE=ubuntu:26.04@sha256:...`
+Pin the base image digest with `BASE_IMAGE=ubuntu:26.04@sha256:... docker compose build`
 for controlled releases. Record GAMESS version, compiler/runtime versions,
 installation checksum and image digest with each release. Rebuild and retest
 when the base image or scientific software changes.
@@ -130,6 +124,15 @@ real calculation, official suite and destination-server run remain required.
 For a managed cloud environment with a provided combined CA bundle, pass
 `--secret id=proxy_ca,src=/etc/ssl/certs/ca-certificates.crt` to builds. The secret
 is used only during package installation and is not copied into the image.
+Use the direct build command in that environment (Compose does not automatically
+forward the secret):
+
+```sh
+docker build --platform linux/amd64 --secret id=proxy_ca,src=/etc/ssl/certs/ca-certificates.crt --target runtime -t forge-gamess:runtime .
+```
+
+For a licensed packaged image, change the target to `packaged` and tag to
+`forge-gamess:local`. APT package signature and TLS verification stay enabled.
 
 To validate only the packaging runtime without licensed software:
 

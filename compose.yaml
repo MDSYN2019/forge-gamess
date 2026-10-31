@@ -1,6 +1,11 @@
 services:
   gamess:
     image: ${GAMESS_IMAGE:-forge-gamess:local}
+    build:
+      context: .
+      target: packaged
+      args:
+        BASE_IMAGE: ${BASE_IMAGE:-ubuntu:26.04}
     platform: linux/amd64
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     network_mode: none
